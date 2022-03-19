@@ -12,6 +12,7 @@ class Messages():
     FUND_WITHDRAWAL = Template.messages.get(id=19).gettext()
     REFERAL = Template.messages.get(id=22).gettext()
     STATISTICS = Template.messages.get(id=23).gettext()
+    REFERAL_LINK = Template.messages.get(id=24).gettext()
 
 
 class Keys():

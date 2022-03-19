@@ -59,7 +59,7 @@ class BotUser(models.Model):
 
     def get_next_video(self):
         last_video = self.videos.all().order_by('id').last()
-        last_video_id = last_video.id if last_video else 0
+        last_video_id = last_video.video.id if last_video else 0
         next_video = Video.videos.filter(id__gt=last_video_id).first()
         if not next_video:
             next_video = random.choice(Video.videos.all())
@@ -107,13 +107,16 @@ class ViewVideo(models.Model):
         to=BotUser,
         on_delete=models.CASCADE,
         related_name='videos',
+        verbose_name='Пользователь',
     )
     video = models.ForeignKey(
         to=Video,
         on_delete=models.CASCADE,
         related_name='views',
+        verbose_name='Видео',
     )
-    received = models.BooleanField(default=False)
+    received = models.BooleanField(default=False,
+                                   verbose_name='Получен бонус?')
     sended = models.DateTimeField(auto_now_add=True,
                                   verbose_name='Отправлено')
 

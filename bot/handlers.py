@@ -94,6 +94,7 @@ def get_bonus_callback_query_handler(bot: TeleBot, call):
     if view_video.can_get_bonus():
         bot.delete_message(chat_id, call.message.id)
         view_video.received = True
+        view_video.save()
         user.balance += BONUS_VALUE
         user.save()
         see_more_button = utils.make_inline_button(
@@ -119,9 +120,44 @@ def get_bonus_callback_query_handler(bot: TeleBot, call):
 
 
 def finish_callback_query_handler(bot: TeleBot, call):
-    call_data = CallTypes.make_data(CallTypes.Profile())
-    call.data = call_data
-    profile_callback_query_handler(bot, call)
+    chat_id = call.message.chat.id
+    bot.delete_message(chat_id, call.message.id)
+    user: BotUser = BotUser.users.get(chat_id=chat_id)
+    text = Messages.PROFILE.format(
+        first_name=call.message.chat.first_name,
+        username=call.message.chat.username,
+        balance=utils.get_money_value_text(user.balance),
+        referals_count=user.referals.count(),
+        true_referals_count=user.get_true_referals().count(),
+        videos_count=user.videos.count(),
+        videos_count_today=user.get_today_viewed_videos().count(),
+    )
+    earn_button = utils.make_inline_button(
+        text=Keys.EARN,
+        CallType=CallTypes.Earn,
+    )
+    fund_withdrawal_button = utils.make_inline_button(
+        text=Keys.FUND_WITHDRAWAL,
+        CallType=CallTypes.FundWithdrawal,
+    )
+    referals_button = utils.make_inline_button(
+        text=Keys.REFERALS,
+        CallType=CallTypes.Referals,
+    )
+    menu_button = utils.make_inline_button(
+        text=Keys.MENU,
+        CallType=CallTypes.Menu,
+    )
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(earn_button)
+    keyboard.add(fund_withdrawal_button)
+    keyboard.add(referals_button)
+    keyboard.add(menu_button)
+    bot.send_message(
+        text=text,
+        chat_id=chat_id,
+        reply_markup=keyboard,
+    )
 
 
 def profile_callback_query_handler(bot: TeleBot, call):
@@ -227,6 +263,10 @@ def referals_callback_query_handler(bot: TeleBot, call):
 
     text = utils.text_to_fat(Keys.REFERALS)
     text += utils.text_to_double_line(referals_info)
+    referal_link = f't.me/watchvideoearnbot?start={user.chat_id}'
+    text += Messages.REFERAL_LINK.format(
+        referal_link=utils.text_to_code(referal_link),
+    )
     watch_video_button = utils.make_inline_button(
         text=Keys.WATCH_VIDEO,
         CallType=CallTypes.Earn,

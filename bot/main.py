@@ -75,5 +75,5 @@ def callback_query_handler(call):
 
 
 if __name__ == "__main__":
-    bot.polling()
-    # bot.infinity_polling()
+    # bot.polling()
+    bot.infinity_polling()

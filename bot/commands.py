@@ -24,8 +24,9 @@ def start_command_handler(bot: TeleBot, message):
     if len(data := message.text.split()) == 2:
         referal_chat_id = data[-1]
         user = BotUser.users.get(chat_id=chat_id)
-        user_referal = BotUser.users.get(chat_id=referal_chat_id)
-        user_referal.referals.add(user)
+        if referal_chat_id != user.chat_id:
+            user_referal = BotUser.users.get(chat_id=referal_chat_id)
+            user_referal.referals.add(user)
 
     earn_button = utils.make_inline_button(
         text=Keys.EARN,
