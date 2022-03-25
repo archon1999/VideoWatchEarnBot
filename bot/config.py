@@ -2,6 +2,10 @@ import os
 import sys
 
 import django
+from dotenv import load_dotenv
+
+env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+load_dotenv(env_path)
 
 
 TOKEN = '5183812194:AAF36T9o9Po0YJIvKgljIRQlYsZJfYIzOzU'

@@ -11,6 +11,7 @@ from bot.call_types import CallTypes
 
 def menu_callback_query_handler(bot: TeleBot, call):
     chat_id = call.message.chat.id
+    user = BotUser.users.get(chat_id=chat_id)
     earn_button = utils.make_inline_button(
         text=Keys.EARN,
         CallType=CallTypes.Earn,
@@ -27,16 +28,23 @@ def menu_callback_query_handler(bot: TeleBot, call):
         text=Keys.REFERALS,
         CallType=CallTypes.Referals,
     )
-    statistics_button = utils.make_inline_button(
-        text=Keys.STATISTICS,
-        CallType=CallTypes.Statistics,
+    support_button = utils.make_inline_button(
+        text=Keys.SUPPORT,
+        CallType=CallTypes.Support,
     )
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(earn_button)
     keyboard.add(profile_button)
     keyboard.add(fund_withdrawal_button)
     keyboard.add(referals_button)
-    keyboard.add(statistics_button)
+    if user.is_admin:
+        statistics_button = utils.make_inline_button(
+            text=Keys.STATISTICS,
+            CallType=CallTypes.Statistics,
+        )
+        keyboard.add(statistics_button)
+
+    keyboard.add(support_button)
     text = utils.text_to_fat(Messages.MENU)
     bot.edit_message_text(
         chat_id=chat_id,
@@ -282,6 +290,28 @@ def referals_callback_query_handler(bot: TeleBot, call):
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(watch_video_button)
     keyboard.add(fund_withdrawal_button)
+    keyboard.add(menu_button)
+    bot.edit_message_text(
+        chat_id=chat_id,
+        text=text,
+        message_id=call.message.id,
+        reply_markup=keyboard,
+    )
+
+
+def support_callback_query_handler(bot: TeleBot, call):
+    chat_id = call.message.chat.id
+    text = Messages.SUPPORT
+    earn_button = utils.make_inline_button(
+        text=Keys.EARN,
+        CallType=CallTypes.Earn,
+    )
+    menu_button = utils.make_inline_button(
+        text=Keys.MENU,
+        CallType=CallTypes.Menu,
+    )
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(earn_button)
     keyboard.add(menu_button)
     bot.edit_message_text(
         chat_id=chat_id,

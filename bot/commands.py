@@ -44,16 +44,24 @@ def start_command_handler(bot: TeleBot, message):
         text=Keys.REFERALS,
         CallType=CallTypes.Referals,
     )
-    statistics_button = utils.make_inline_button(
-        text=Keys.STATISTICS,
-        CallType=CallTypes.Statistics,
+    support_button = utils.make_inline_button(
+        text=Keys.SUPPORT,
+        CallType=CallTypes.Support,
     )
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(earn_button)
     keyboard.add(profile_button)
     keyboard.add(fund_withdrawal_button)
     keyboard.add(referals_button)
-    keyboard.add(statistics_button)
+    keyboard.add(support_button)
+    user = BotUser.users.get(chat_id=chat_id)
+    if user.is_admin:
+        statistics_button = utils.make_inline_button(
+            text=Keys.STATISTICS,
+            CallType=CallTypes.Statistics,
+        )
+        keyboard.add(statistics_button)
+
     text = utils.text_to_fat(Messages.MENU)
     bot.send_message(chat_id, text,
                      reply_markup=keyboard)

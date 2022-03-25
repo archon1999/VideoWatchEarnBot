@@ -40,6 +40,7 @@ class CallTypes():
     Statistics = CallTypeMeta('Statistics')
     GetBonus = CallTypeMeta('GetBonus', 'id')
     Finish = CallTypeMeta('Finish')
+    Support = CallTypeMeta('Support')
     GetPaid = CallTypeMeta('GetPaid')
 
     Nothing = CallTypeMeta('Nothing')

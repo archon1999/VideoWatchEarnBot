@@ -13,6 +13,7 @@ class Messages():
     REFERAL = Template.messages.get(id=22).gettext()
     STATISTICS = Template.messages.get(id=23).gettext()
     REFERAL_LINK = Template.messages.get(id=24).gettext()
+    SUPPORT = Template.messages.get(id=26).gettext()
 
 
 class Keys():
@@ -27,6 +28,7 @@ class Keys():
     STATISTICS = Template.keys.get(id=18).gettext()
     GET_PAID = Template.keys.get(id=20).gettext()
     WATCH_VIDEO = Template.keys.get(id=21).gettext()
+    SUPPORT = Template.keys.get(id=25).gettext()
 
 
 class Smiles():

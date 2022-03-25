@@ -62,6 +62,7 @@ callback_query_handlers = {
     CallTypes.Referals: handlers.referals_callback_query_handler,
     CallTypes.Statistics: handlers.statistics_callback_query_handler,
     CallTypes.Finish: handlers.finish_callback_query_handler,
+    CallTypes.Support: handlers.support_callback_query_handler,
 }
 
 

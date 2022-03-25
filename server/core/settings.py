@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend',
     'ckeditor',
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -111,3 +112,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+Q_CLUSTER = {
+    'name': 'cpython',
+    'workers': 3,
+    'recycle': 500,
+    'timeout': 180,
+    'retry': 180,
+    'compress': True,
+    'save_limit': 1000,
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Django Q',
+    'redis': {
+        'host': '127.0.0.1',
+        'port': 6379,
+        'db': 0,
+    }
+}

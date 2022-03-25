@@ -6,17 +6,30 @@ from django.db import models
 from django.db.models import Count
 from django.utils import timezone
 
+from dotenv import load_dotenv
+
 from ckeditor.fields import RichTextField
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString, Tag
 
+from django_q.models import Schedule
+from django_q.tasks import schedule
 
-VIDEO_LIMIT_PER_DAY = 2  # Лимит видео на день
-TRUE_REFERAL_VIDEOS_COUNT = 2  # Количество просмотренных видео для реферала
-PAYMENT_PERMS_REFERALS_COUNT = 1  # Количество рефералов для выплаты
-PAYMENT_PERMS_VIEWED_VIDEOS_COUNT = 10  # Количество видео для выплаты
-BONUS_VALUE = 10  # Размер бонуса для каждого видео
-CAN_GET_BONUS_TIME = 20  # Время, после которого можно получить этот бонус
+
+env_path = os.path.join(os.path.dirname(
+    os.path.dirname(os.path.dirname(__file__))), '.env')
+load_dotenv(env_path)
+
+
+VIDEO_LIMIT_PER_DAY = int(os.getenv('VIDEO_LIMIT_PER_DAY'))
+TRUE_REFERAL_VIDEOS_COUNT = int(os.getenv('TRUE_REFERAL_VIDEOS_COUNT'))
+REFERAL_BONUS = int(os.getenv('REFERAL_BONUS'))
+PAYMENT_PERMS_REFERALS_COUNT = int(os.getenv('PAYMENT_PERMS_REFERALS_COUNT'))
+PAYMENT_PERMS_VIEWED_VIDEOS_COUNT = int(os.getenv(
+    'PAYMENT_PERMS_VIEWED_VIDEOS_COUNT'
+))
+BONUS_VALUE = int(os.getenv('BONUS_VALUE'))
+CAN_GET_BONUS_TIME = int(os.getenv('CAN_GET_BONUS_TIME'))
 
 
 class BotUser(models.Model):
@@ -35,10 +48,14 @@ class BotUser(models.Model):
                                verbose_name='ИД чата')
     balance = models.IntegerField(default=0,
                                   verbose_name='Баланс')
-    referals = models.ManyToManyField(to='self',
-                                      symmetrical=False,
-                                      blank=True,
-                                      verbose_name='Рефералы')
+    invited = models.ForeignKey(to='self',
+                                on_delete=models.CASCADE,
+                                related_name='referals',
+                                null=True,
+                                blank=True,
+                                verbose_name='Кто пригласил')
+    is_admin = models.BooleanField(default=False,
+                                   verbose_name='Админ?')
     bot_state = models.IntegerField(default=States.NOTHING,
                                     choices=States.choices)
     created = models.DateTimeField(auto_now_add=True,
@@ -127,6 +144,66 @@ class ViewVideo(models.Model):
     class Meta:
         verbose_name = 'Просмотр видео'
         verbose_name_plural = 'Просмотры видео'
+
+
+class Post(models.Model):
+    class Period(models.TextChoices):
+        HOURLY = Schedule.HOURLY, 'Ежечасный'
+        DAILY = Schedule.DAILY, 'Ежедневный'
+
+    posts = models.Manager()
+    title = models.CharField(max_length=255,
+                             verbose_name='Название(для себя)',
+                             default='')
+    body = RichTextField(verbose_name='Текст')
+    image = models.ImageField(
+        verbose_name='Картинка(опционально)',
+        upload_to='backend/posts',
+        null=True,
+        blank=True,
+    )
+    start_date = models.DateTimeField(
+        verbose_name='Дата первой отправки',
+        default=timezone.now,
+    )
+    schedule = models.OneToOneField(
+        to=Schedule,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    period = models.CharField(
+        max_length=1,
+        choices=Period.choices,
+        verbose_name='Период',
+    )
+    repeats = models.IntegerField(
+        verbose_name='Количество повторов(-1 для бесконечного повтора)',
+        default=1,
+    )
+
+    def gettext(self):
+        return filter_html(self.body)
+
+    def save(self, *args, **kwargs):
+        result = super().save(*args, **kwargs)
+        if not self.schedule:
+            self.schedule = schedule(
+                'backend.tasks.send_post',
+                self.id,
+                next_run=self.start_date,
+                schedule_type=self.period,
+                repeats=self.repeats,
+            )
+        else:
+            self.schedule.schedule_type = self.period
+            self.schedule.repeats = self.repeats
+            self.schedule.save()
+        return result
+
+    class Meta:
+        verbose_name = 'Публикация'
+        verbose_name_plural = 'Публикации'
 
 
 def filter_tag(tag: Tag, ol_number=None):
