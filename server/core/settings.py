@@ -115,7 +115,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 Q_CLUSTER = {
     'name': 'cpython',
-    'workers': 3,
+    'workers': 1,
     'recycle': 500,
     'timeout': 180,
     'retry': 180,
