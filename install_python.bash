@@ -4,7 +4,7 @@ sudo apt-get install -y curl
 sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev libpq-dev
 sudo wget https://www.python.org/ftp/python/3.10.2/Python-3.10.2.tgz 
 sudo tar xzf Python-3.10.2.tgz 
-sudo cd Python-3.10.2 && ./configure --enable-optimizations && make altinstall
+cd Python-3.10.2 && ./configure --enable-optimizations && make altinstall
 rm -r Python-3.10.2
 rm Python-3.10.2.tgz
 sudo python3.10 -m pip install --upgrade pip
