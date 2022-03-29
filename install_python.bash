@@ -16,3 +16,4 @@ pip3.10 install redis
 pip3.10 install bs4
 pip3.10 install lxml
 pip3.10 install django-ckeditor
+pip3.10 install psutil
