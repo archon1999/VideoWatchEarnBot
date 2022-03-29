@@ -9,7 +9,7 @@ env_path = os.path.join(os.path.dirname(
 load_dotenv(env_path)
 
 
-TOKEN = '5183812194:AAF36T9o9Po0YJIvKgljIRQlYsZJfYIzOzU'
+TOKEN = os.getenv('TOKEN')
 
 PARENT_PACKAGE = '..'
 APP_PACKAGE = 'server'
