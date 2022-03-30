@@ -63,6 +63,7 @@ callback_query_handlers = {
     CallTypes.Statistics: handlers.statistics_callback_query_handler,
     CallTypes.Finish: handlers.finish_callback_query_handler,
     CallTypes.Support: handlers.support_callback_query_handler,
+    CallTypes.GetPaid: handlers.get_paid_callback_query_handler,
 }
 
 

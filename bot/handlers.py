@@ -271,7 +271,7 @@ def referals_callback_query_handler(bot: TeleBot, call):
 
     text = utils.text_to_fat(Keys.REFERALS)
     text += utils.text_to_double_line(referals_info)
-    referal_link = f't.me/watchvideoearnbot?start={user.chat_id}'
+    referal_link = f't.me/{bot.get_me().username}?start={user.chat_id}'
     text += Messages.REFERAL_LINK.format(
         referal_link=utils.text_to_code(referal_link),
     )
@@ -290,6 +290,23 @@ def referals_callback_query_handler(bot: TeleBot, call):
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(watch_video_button)
     keyboard.add(fund_withdrawal_button)
+    keyboard.add(menu_button)
+    bot.edit_message_text(
+        chat_id=chat_id,
+        text=text,
+        message_id=call.message.id,
+        reply_markup=keyboard,
+    )
+
+
+def get_paid_callback_query_handler(bot: TeleBot, call):
+    chat_id = call.message.chat.id
+    text = Messages.GET_PAID
+    menu_button = utils.make_inline_button(
+        text=Keys.MENU,
+        CallType=CallTypes.Menu,
+    )
+    keyboard = types.InlineKeyboardMarkup()
     keyboard.add(menu_button)
     bot.edit_message_text(
         chat_id=chat_id,

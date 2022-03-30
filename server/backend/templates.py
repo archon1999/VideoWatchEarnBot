@@ -14,6 +14,7 @@ class Messages():
     STATISTICS = Template.messages.get(id=23).gettext()
     REFERAL_LINK = Template.messages.get(id=24).gettext()
     SUPPORT = Template.messages.get(id=26).gettext()
+    GET_PAID = Template.messages.get(id=27).gettext()
 
 
 class Keys():
